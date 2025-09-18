@@ -16,6 +16,11 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.japp.Desadvm"
     },
+    "androidNavigationBar": {
+      "visible": false,
+      "barStyle": "light-content",
+      "backgroundColor": "#000000"
+    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -24,6 +29,7 @@
       "edgeToEdgeEnabled": true,
       "package": "com.japp.Desadvm"
     },
+    
     "web": {
       "favicon": "./assets/favicon.png"
     },

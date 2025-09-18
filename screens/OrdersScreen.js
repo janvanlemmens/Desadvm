@@ -95,7 +95,7 @@ async function fetchAndSaveOrders() {
                 
               }, Realm.UpdateMode.Modified)
 
-              console.log("Created:",savedOrder.id,"->", savedOrder.deliveryNote)
+              console.log("Created:",savedOrder.id,"->", savedOrder.arrival+"-"+savedOrder.supplier)
              
       });
       });
@@ -166,7 +166,7 @@ const distinctNotesSorted = getDistinctNotes(notes1).sort(
     (a, b) => Number(b.confirmed) - Number(a.confirmed)
   );
 
-  console.log("notessorted",distinctNotesSorted )
+  //console.log("notessorted",distinctNotesSorted )
   
    // --- Apply search filters ---
   const filteredData = distinctNotesSorted.filter((item) => {
@@ -181,10 +181,14 @@ const distinctNotesSorted = getDistinctNotes(notes1).sort(
 
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "left", "right", "bottom"]}>
+    <View style={{flex: 1}} >
+      <View style={{ padding: 8 }}>
+
      <Text style={styles.title}>Delivery Notes</Text>
+   
+   
      <View style={{ flexDirection: "row", padding: 8, gap: 8 }}>
-  <TextInput
+     <TextInput
     style={[styles.searchInput, { flex: 1 }]}
     placeholder="Search by Supplier..."
     value={supplierQuery}
@@ -196,10 +200,12 @@ const distinctNotesSorted = getDistinctNotes(notes1).sort(
     value={noteQuery}
     onChangeText={setNoteQuery}
   />
-</View>
+  </View>
+  </View>
 
-
+<View style={{ flex: 1 }}  >
      <FlatList
+    
      ref={flatListRef}
       data={filteredData}
       keyExtractor={(item) => item.orderid}
@@ -219,26 +225,27 @@ const distinctNotesSorted = getDistinctNotes(notes1).sort(
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     />
+  </View>
+
    {/*<LogoutButton/>*/} 
-    </SafeAreaView>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   container : {
     flex: 1,
-    padding: 16,
     backgroundColor: "#f5f5f5",
   },
   title: {
     fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 12
+    marginBottom: 6
   },
   card: {
     backgroundColor: "#fff",
     padding: 12,
-    marginBottom: 12,
+    marginBottom: 6,
     borderRadius: 8,
     borderBottomWidth: 1,
     borderColor: "#ddd",
@@ -259,7 +266,7 @@ const styles = StyleSheet.create({
   borderColor: "#ccc",
   borderRadius: 8,
   padding: 8,
-  marginBottom: 10,
+  marginBottom: 6,
 }
 
 })

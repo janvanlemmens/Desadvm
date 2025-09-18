@@ -80,13 +80,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: "center",
     justifyContent: "center",
-     marginBottom: 12,
+     marginBottom: 6,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
     shadowRadius: 6,
   },
   text: {
-    fontWeight: "600",
-    fontSize: 18,
+    fontWeight: "400",
+    fontSize: 16,
   },
 });

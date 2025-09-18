@@ -49,9 +49,11 @@ export default function OrderItem({ item }) {
           </Pressable>
 
           <TextInput
-            style={[styles.qtyInput, confirmedQty === item.quantity && {backgroundColor: '#8cf68cff'}]}
+            style={[styles.qtyInput, confirmedQty === item.quantity && {backgroundColor: '#8cf68cff', color: '#000'}]}
             keyboardType="numeric"
             value={String(confirmedQty)}
+             placeholderTextColor="#000"
+             selectionColor="#000"
             onChangeText={(text) => {
               const num = parseInt(text) || 0;
               updateRealmQty(num);
@@ -117,7 +119,7 @@ const styles = StyleSheet.create({
    card: {
     backgroundColor: "#fff",
     padding: 12,
-    marginBottom: 12,
+    marginBottom: 6,
     borderRadius: 8,
     borderBottomWidth: 1,
     borderColor: "#ddd",

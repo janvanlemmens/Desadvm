@@ -116,8 +116,8 @@ export default function TabsNavigator({ onLogout }) {
           initialParams={{ type: "nu" }}
           options={{
             headerTitle: withIconTitle("Orders", "cube-outline"),
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="cube-outline" color={color} size={size} />
+            tabBarIcon: ({ focused, color, size }) => (
+              <Ionicons name="cube-outline" color={focused ? "#c96161ff" : "#333"} size={size} />
             ),
           }}
         />
@@ -127,8 +127,8 @@ export default function TabsNavigator({ onLogout }) {
           initialParams={{ type: "nietnu" }}
           options={{
             headerTitle: withIconTitle("Search", "search-outline"),
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="search-outline" color={color} size={size} />
+            tabBarIcon: ({ focused, color, size }) => (
+              <Ionicons name="search-outline" color={focused ? "#c96161ff" : "#333"} size={size} />
             ),
           }}
         />
@@ -138,17 +138,22 @@ export default function TabsNavigator({ onLogout }) {
           initialParams={{ orderid: null }}
           options={{
             headerTitle: withIconTitle("Order", "create-outline"),
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="create-outline" color={color} size={size} />
+            tabBarIcon: ({ focused, color, size }) => (
+              <Ionicons name="create-outline" color={focused ? "#c96161ff" : "#333"} size={size} />
             ),
           }}
         />
         <Tab.Screen
           name="Scan"
           component={ScanScreen}
-          options={{
-            tabBarButton: () => null, // hide from the tab bar
-            tabBarStyle: { display: "none" }, // v6/v7 way to hide bar when focused
+           options={{
+            headerTitle: withIconTitle("Scan", "barcode-outline"),
+            tabBarIcon: ({ focused, color, size }) => (
+              <Ionicons name="barcode-outline" color={focused ? "#c96161ff" : "#333"} size={size} />
+            ),
+            tabBarButton: (props) => (
+            <TouchableOpacity {...props} onPress={() => {}} activeOpacity={1} />
+             ), // disable tab press
           }}
         />
       </Tab.Group>
@@ -157,6 +162,12 @@ export default function TabsNavigator({ onLogout }) {
 }
 
 /*
+
+options={{
+            tabBarButton: () => null, // hide from the tab bar
+            tabBarStyle: { display: "none" }, // v6/v7 way to hide bar when focused
+          }}
+
 /tabBar={(props) => <CustomTabBar {...props} />}
 screenOptions={{
         headerTitleAlign: "center",
