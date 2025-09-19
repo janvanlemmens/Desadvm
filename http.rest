@@ -26,3 +26,14 @@ Content-Type: application/json
   "depot": 59
   
 }
+
+### DeAdCfm
+
+POST https://extranet.qteam.be/VPLD/rest.desadv.cls?func=DeAdCfm
+Content-Type: application/json
+
+{
+  "orders": [{"arrival": "2025-09-18", "article": "167037", "brand": "MI", "deliveryNote": "37409897~FRN96924~FRN97266", "depot": "59", "description": "385/65 R 22.5  RX m+s 3pmsf 160K TL", "ean": "3528704792610", "id": "2025-09-18|MICHELIN|3528704792610", "profile": "X MULTI T", "quantity": 1, "quantitycfm": 1, "supplier": "MICHELIN"}, {"arrival": "2025-09-18", "article": "189584", "brand": "MI", "deliveryNote": "37409897~FRN96924~FRN97266", "depot": "59", "description": "235/65 R 16 115R  m+s 3pmsf TL", "ean": "3528707808479", "id": "2025-09-18|MICHELIN|3528707808479", "profile": "AGILIS CROSSCLIMATE", "quantity": 2, "quantitycfm": 2, "supplier": "MICHELIN"}, {"arrival": "2025-09-18", "article": "210800", "brand": "MI", "deliveryNote": "37409897~FRN96924~FRN97266", "depot": "59", "description": "315/80 R 22.5  VM m+s 3pmsf 156/150L TL", "ean": "3528709742399", "id": "2025-09-18|MICHELIN|3528709742399", "profile": "X MULTI D", "quantity": 6, "quantitycfm": 5, "supplier": "MICHELIN"}],
+  "token": "9A93251D08D54EF7B193759EB4915A8B"
+  
+}

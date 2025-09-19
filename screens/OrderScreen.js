@@ -3,12 +3,14 @@ import CustomPressable from '../components/CustomPressable'
 import React,  { useEffect, useState } from 'react'
 import OrderItem from '../components/OrderItem'
 import { useRealm } from '../useRealm';
+import * as SecureStore from "expo-secure-store";
+import axios from "axios";
 
 const OrderScreen = ({route, navigation}) => {
 const {arrival, supplier, deliveryNote} = route.params ?? {};
 const [order, setOrder] = useState([]);
 
-
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 const realm = useRealm();
 
 useEffect(() => {
@@ -41,7 +43,7 @@ useEffect(() => {
     console.log("order state updated:", order);
   }, [order]);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     //const allConfirmed = order.every(item => item.quantitycfm > 0);
     const atLeastOneConfirmed = order.some(item => item.quantitycfm > 0);
 
@@ -49,19 +51,45 @@ useEffect(() => {
     alert("No items have quantitycfm > 0");
     return; // stop execution if none are confirmed
   }
-    /*
+
+  const token = await SecureStore.getItemAsync("token");
+    
+  try {
+    const results = realm.objects("Orders").filtered("arrival == $0 AND supplier == $1", arrival, supplier);
+    // 2. Map to a JSON-friendly array
+    const ordersToPost = results.map(item => ({
+      id: item.id,
+      deliveryNote: item.deliveryNote,
+      depot: item.depot,
+      arrival: item.arrival,
+      supplier: item.supplier,
+      article: item.article,
+      description: item.description,
+      profile: item.profile,
+      ean: item.ean,
+      brand: item.brand,
+      quantity: item.quantity,
+      quantitycfm: item.quantitycfm,
+    }));
+    // 3. Send POST request
+    const response = await axios.post(`${apiUrl}/rest.desadv.cls?func=DeAdCfm`, {
+      orders: ordersToPost,
+      token: token
+    });
+
+    console.log("Server response:", response.data);
+    if (!response.data?.success) {return;}
+
     realm.write(() => {
-    const delnote = realm.objectForPrimaryKey("Orders", orderid); arrival= and supplier= ervan tussen
-     if (delnote) {
-      if (delnote.quantitycfm == 0) {
-        Alert.alert('Order','Not confirmed')
-        return;
-      }
-     realm.delete(delnote);
-   }
-});
-  */
-   navigation.navigate("Orders",{"type" : 'nu'})
+      realm.delete(results);
+    })
+    navigation.navigate("Orders",{"type" : 'nu'})
+   
+
+  } catch (error) {
+  console.error("Failed to post orders:", error);
+   alert("Failed to post orders. Please try again.");
+  }
    
   }
 

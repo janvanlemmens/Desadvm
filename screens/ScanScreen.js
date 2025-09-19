@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, TextInput, Text, StyleSheet, FlatList } from "react-native";
+import { View, TextInput, Text, StyleSheet, FlatList, Pressable } from "react-native";
 import CustomPressable from "../components/CustomPressable";
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRealm } from "../useRealm";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Swipeable } from "react-native-gesture-handler";
 
 export default function ScanScreen({ route, navigation }) {
   const { arrival, supplier, deliveryNote } = route.params;
@@ -19,9 +20,19 @@ export default function ScanScreen({ route, navigation }) {
   const lastScanRef = useRef({ code: null, ts: 0 });
   const realm = useRealm();
   const insets = useSafeAreaInsets();
+  
 
   const updateQuantities = (arr, supp, barcodes) => {
     realm.write(() => {
+
+      const upd0 =  realm
+          .objects("Orders")
+          .filtered("arrival == $0 and supplier == $1", arr, supp);
+
+          upd0.forEach((item) => {
+          item.quantitycfm = 0;
+        });
+
       barcodes.forEach(({ code, count }) => {
         //console.log("code", code);
         const matchingItems = realm
@@ -60,7 +71,6 @@ export default function ScanScreen({ route, navigation }) {
     console.log("barcodes", barcodes);
     updateQuantities(arrival, supplier, barcodes);
     //barcodes [{"code": "3286341037012", "count": 4}]
-    setBarcodes([]);
     navigation.navigate("Order",{"arrival" : arrival, "supplier": supplier, "deliveryNote": deliveryNote})
   };
 
@@ -141,28 +151,65 @@ export default function ScanScreen({ route, navigation }) {
         inputRef.current?.focus();
       }, 200);
 
+      const initBarcodes = async () => {
+      const brand = await SecureStore.getItemAsync("brand");
+      const depot = await SecureStore.getItemAsync("depot");
+      setBrand(brand);
+      setDepot(depot);
+
+      const results = realm
+        .objects("Orders")
+        .filtered("arrival == $0 AND supplier == $1", arrival, supplier);
+
+      const barcodeArray = results
+       .filtered("quantitycfm > 0")
+       .map(item => ({
+        code: item.ean,
+        count: item.quantitycfm,
+      }));
+
+      setBarcodes(barcodeArray);
+    };
+    initBarcodes();
+
       return () => {
-        // cleanup if needed
+        setBarcodes([]);
       };
     }, [])
   );
 
-  useEffect(() => {
-    const init = async () => {
-      const brand = await SecureStore.getItemAsync("brand");
-      const depot = await SecureStore.getItemAsync("depot");
-      
-      setBrand(brand);
-      setDepot(depot)
-    };
-    init();
-  }, [barcodes]);
+ 
 
   useEffect(() => {
     if (barcodes.length && flatListRef.current) {
       flatListRef.current.scrollToEnd({ animated: true });
     }
   }, [barcodes]);
+
+  const handleRemove = (code) => {
+  setBarcodes((prev) => {
+    const updated = prev.filter((item) => item.code !== code);
+    console.log("Updated barcodes:", updated); // log the array that will actually be used
+    return updated;
+  });
+};
+
+
+  const renderRightActions = (index) => {
+    return (
+      <Pressable
+        onPress={() => handleRemove(index)}
+        style={{
+          backgroundColor: 'red',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: 80,
+        }}
+      >
+        <Text style={{ color: '#fff', fontWeight: 'bold' }}>Delete</Text>
+      </Pressable>
+    );
+  };
 
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom + 8 }]}>
@@ -185,8 +232,12 @@ export default function ScanScreen({ route, navigation }) {
       <FlatList
         ref={flatListRef}
         data={barcodes}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
+        keyExtractor={(item) => item.code}
+        renderItem={({ item, index }) => (
+           <Swipeable
+          renderRightActions={() => renderRightActions(item.code)}
+          onSwipeableOpen={() => handleRemove(item.code)}
+        >
           <View
             style={{
               flexDirection: "row",
@@ -197,6 +248,8 @@ export default function ScanScreen({ route, navigation }) {
             <Text style={{ fontSize: 18 }}>{item.code}</Text>
             <Text style={{ fontSize: 18 }}>x{item.count}</Text>
           </View>
+</Swipeable>
+
         )}
         style={{ flex: 1, marginTop: 10 }}
       />

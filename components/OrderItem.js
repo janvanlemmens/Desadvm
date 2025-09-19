@@ -49,7 +49,18 @@ export default function OrderItem({ item }) {
           </Pressable>
 
           <TextInput
-            style={[styles.qtyInput, confirmedQty === item.quantity && {backgroundColor: '#8cf68cff', color: '#000'}]}
+            style={[styles.qtyInput, confirmedQty === item.quantity && {
+              backgroundColor: "#8cf68cff",
+              color: "#000",
+              borderWidth: 2,
+              borderColor: "#00aa00",
+              shadowColor: "#00aa00",
+              shadowOffset: { width: 0, height: 0 },
+              shadowOpacity: 0.5,
+              shadowRadius: 6,
+              elevation: 3, // Android shadow
+            }
+          ]}
             keyboardType="numeric"
             value={String(confirmedQty)}
              placeholderTextColor="#000"
@@ -115,6 +126,8 @@ const styles = StyleSheet.create({
     minWidth: 50,
     textAlign: "center",
     fontSize: 16,
+    color: "#000", // default text color
+    backgroundColor: "#fff", // default background
   },
    card: {
     backgroundColor: "#fff",
