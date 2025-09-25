@@ -14,7 +14,7 @@ import * as SecureStore from "expo-secure-store";
 import Realm from "realm";
 import CustomPressable from "../components/CustomPressable";
 import DeviceInfo from "react-native-device-info";
-
+/*
 const api = axios.create();
 
 api.interceptors.request.use((config) => {
@@ -32,6 +32,7 @@ api.interceptors.response.use(
     return Promise.reject(err);
   }
 );
+*/
 
 export default function LoginScreen({ onLogin }) {
   const [username, setUsername] = useState("");
@@ -41,6 +42,7 @@ export default function LoginScreen({ onLogin }) {
   const [checkingToken, setCheckingToken] = useState(true);
 
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+  console.log("api", apiUrl);
 
   useEffect(() => {
     const logDevice = async () => {
@@ -55,8 +57,11 @@ export default function LoginScreen({ onLogin }) {
       );
       //Running on: unitech EA520 (Android 11)
       //npx react-native run-android => new android/app/build/outputs/apk/debug/app-debug.apk
-      //cd android ./gradlew assembleRelease
+      //cd android ./gradlew assembleRelease (niet is bare workflow)
       //adb install android/app/build/outputs/apk/release/app-release.apk
+      //eas build -p android --profile preview --local
+      //adb push /Users/janvanlemmens/RNDev/desadvm/build-1758549397084.apk /sdcard/Download
+      //adb logcat | grep ReactNativeJS
     };
 
     logDevice(); // ✅ actually run it
@@ -65,7 +70,7 @@ export default function LoginScreen({ onLogin }) {
     (async () => {
       try {
         const token = await SecureStore.getItemAsync("token");
-        console.log
+        console.log("Stored token:", token);
         if (!token) return;
 
         // Verifieer token bij je API (pas URL aan naar jouw endpoint)
@@ -74,6 +79,8 @@ export default function LoginScreen({ onLogin }) {
         });
 
         if (!mounted) return;
+
+        console.log("response", res.data);
 
         // Stel dat API { success: true, uname, depot, ... } teruggeeft als token ok is
         if (res.data?.success) {

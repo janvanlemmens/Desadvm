@@ -29,12 +29,16 @@
       "edgeToEdgeEnabled": true,
       "package": "com.japp.Desadvm"
     },
-    
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "b8df2ca1-fe02-42d9-8465-ad84ca0db09a"
+      }
+    }
   }
 }

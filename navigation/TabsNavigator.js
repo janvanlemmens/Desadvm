@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 //import Icon from "react-native-vector-icons/Ionicons";
 import { Ionicons } from '@expo/vector-icons';
 import OrdersScreen from "../screens/OrdersScreen";
 import OrderScreen from "../screens/OrderScreen";
 import ScanScreen from "../screens/ScanScreen";
+import  DownloadEans from "../components/DownloadEans";
 import { Text, View, TouchableOpacity } from "react-native";
 import * as SecureStore from "expo-secure-store";
 
@@ -28,6 +30,7 @@ const HeaderUsername = ({ name }) => (
 
 const HeaderMenu = ({ onLogout }) => {
   const [open, setOpen] = useState(false);
+  const [showDownload, setShowDownload] = useState(false);
   return (
     <View style={{ position: "relative" }}>
       <TouchableOpacity
@@ -37,7 +40,7 @@ const HeaderMenu = ({ onLogout }) => {
         <Ionicons name="ellipsis-vertical" size={20} />
       </TouchableOpacity>
 
-      {open ? (
+      {open && (
         <View
           style={{
             position: "absolute",
@@ -52,25 +55,44 @@ const HeaderMenu = ({ onLogout }) => {
             shadowOpacity: 0.1,
             shadowOffset: { width: 0, height: 2 },
             shadowRadius: 6,
-            minWidth: 120,
+            minWidth: 160,
+          
           }}
         >
           <TouchableOpacity
+          style={styles.button}
             onPress={() => {
               setOpen(false);
               onLogout();
             }}
           >
-            <Text>Uitloggen</Text>
+            <Text style={styles.buttonText}>Uitloggen</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+          style={styles.button}
+            onPress={() => {
+              setOpen(false);
+              setShowDownload(true)
+      
+            }}
+          >
+            <Text style={styles.buttonText}>Download Eans</Text>
+          </TouchableOpacity>
+         
         </View>
-      ) : null}
+      ) }
+      <DownloadEans
+        visible={showDownload}
+        onClose={() => setShowDownload(false)}
+      />
+
     </View>
   );
 };
 
 export default function TabsNavigator({ onLogout }) {
   const [uname, setUname] = useState(null);
+  
 
   const logout = () => {
     // jouw logout logica
@@ -160,6 +182,25 @@ export default function TabsNavigator({ onLogout }) {
     </Tab.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16, // optional padding for the whole group
+  },
+  button: {
+    backgroundColor: "#e0e0e0", // light grey
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginBottom: 12, // vertical space between buttons
+  },
+  buttonText: {
+    fontSize: 16, // bigger text
+    fontWeight: "600",
+    color: "#000",
+    textAlign: "center",
+  },
+});
 
 /*
 
