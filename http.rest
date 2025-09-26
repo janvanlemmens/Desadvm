@@ -47,3 +47,13 @@ Authorization: Bearer D0EAD76C5A9D40669B23437EB16DE558
 #### ean
 
 GET https://extranet.qteam.be/VPLD/desadv.exportean.cls
+
+### DeAdSupp
+
+POST https://extranet.qteam.be/VPLD/rest.desadv.cls?func=DeAdSupp
+Content-Type: application/json
+
+{
+  "depot": 59
+
+}

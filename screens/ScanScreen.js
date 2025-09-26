@@ -3,7 +3,7 @@ import { View, TextInput, Text, StyleSheet, FlatList, Pressable } from "react-na
 import CustomPressable from "../components/CustomPressable";
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
-import { useRealm } from "../useRealm";
+import { useRealm, useRealm1 } from "../useRealm";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Swipeable } from "react-native-gesture-handler";
 
@@ -19,6 +19,7 @@ export default function ScanScreen({ route, navigation }) {
   const scanTimeoutRef = useRef(null);
   const lastScanRef = useRef({ code: null, ts: 0 });
   const realm = useRealm();
+  const realm1 = useRealm1();
   const insets = useSafeAreaInsets();
   
 
@@ -87,8 +88,24 @@ export default function ScanScreen({ route, navigation }) {
     }
 
     lastScanRef.current = { code: scannedCode, ts: now };
-
+ let eandescr = "Unknown item";
     console.log("✅ scannedCode:", JSON.stringify(scannedCode));
+     const results1 = realm1.objects("Eans").filtered("ean == $0", scannedCode);
+     if (results1.length > 0) {
+      console.log("Found in Eans:", results1[0].descr1);
+      eandescr = results1[0].descr1;
+     } else {
+      console.log("EAN not found in database");
+     }
+
+    // Prevent empty or invalid codes
+    if (!scannedCode || scannedCode.length < 3) {
+      console.log("⚠️ Ignored invalid code:", scannedCode);
+      setBarcode("");
+      inputRef.current?.clear();
+      inputRef.current?.focus();
+      return;
+    }
 
     // Add to list immutably
     setBarcodes((prev) => {
@@ -99,7 +116,7 @@ export default function ScanScreen({ route, navigation }) {
           item.code === scannedCode ? { ...item, count: item.count + 1 } : item
         );
       } else {
-        return [...prev, { code: scannedCode, count: 1 }];
+        return [...prev, { code: scannedCode, count: 1 , descr: eandescr}];
       }
     });
 
@@ -160,13 +177,32 @@ export default function ScanScreen({ route, navigation }) {
       const results = realm
         .objects("Orders")
         .filtered("arrival == $0 AND supplier == $1", arrival, supplier);
+      console.log("Initial results:", results.length);
+       
+      const barcodeArray = results.filtered("quantitycfm > 0").map(item => {
+    console.log("Mapping item:", item.ean, item.quantitycfm);
 
-      const barcodeArray = results
-       .filtered("quantitycfm > 0")
-       .map(item => ({
+        try {
+          const match = realm1.objects("Eans").filtered("ean == $0", item.ean);
+          console.log("Match length:", match.length);
+         return {
+          code: item.ean,
+           count: item.quantitycfm,
+          descr: match[0]?.descr1 ?? "",
+       };
+        } catch (e) {
+          console.log("Error querying Eans:", e.message);
+        return {
         code: item.ean,
         count: item.quantitycfm,
-      }));
+        descr: "",
+  };
+        }
+    
+
+  });
+
+  console.log("Initial barcodes:", barcodeArray);
 
       setBarcodes(barcodeArray);
     };
@@ -175,7 +211,7 @@ export default function ScanScreen({ route, navigation }) {
       return () => {
         setBarcodes([]);
       };
-    }, [])
+    }, [arrival, supplier, realm, realm1])
   );
 
  
@@ -247,6 +283,9 @@ export default function ScanScreen({ route, navigation }) {
           >
             <Text style={{ fontSize: 18 }}>{item.code}</Text>
             <Text style={{ fontSize: 18 }}>x{item.count}</Text>
+          </View>
+          <View>
+            <Text style={{ fontSize: 12, color: '#555', paddingLeft: 8 }}>{item.descr}</Text>
           </View>
 </Swipeable>
 

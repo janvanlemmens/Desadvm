@@ -40,8 +40,18 @@ useEffect(() => {
   }, [arrival,supplier]);
 
   useEffect(() => {
-    console.log("order state updated:", order);
-  }, [order]);
+    if (!realm) return;
+    const data = realm.objects("Orders")
+     .filtered("arrival == $0 and supplier ==  $1", arrival, supplier)
+    .sorted("id");
+    setOrder([...data]);
+
+    // live updates when realm changes
+    const listener = () => setOrder([...data]);
+    data.addListener(listener);
+
+    return () => data.removeListener(listener);
+  }, [realm]);
 
   const handleConfirm = async () => {
     //const allConfirmed = order.every(item => item.quantitycfm > 0);
@@ -93,6 +103,20 @@ useEffect(() => {
    
   }
 
+  const handleDelete = (id) => {
+    if (!realm) return;
+  // filter out deleted item from local state (React UI)
+ realm.write(() => {
+    const order = realm.objectForPrimaryKey("Orders", id);
+    if (order) realm.delete(order);
+    const results = realm
+          .objects("Orders")
+          .filtered("arrival == $0 and supplier ==  $1", arrival, supplier);
+
+         setOrder(results); // keep Realm objects live
+  });
+};
+
 
   return (
     <View style={styles.container}>
@@ -117,9 +141,9 @@ useEffect(() => {
       </View>
     
     <FlatList
-  data={order}
+  data={order.filter(o => o.isValid())}
   keyExtractor={(item) => item.id}
-  renderItem={({ item }) => <OrderItem item={item}/>}
+  renderItem={({ item }) => <OrderItem item={item} onDelete={handleDelete}/>}
   style={{ flex: 1, marginTop: 10 }}
 />
 

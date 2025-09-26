@@ -1,17 +1,32 @@
 // OrderItem.js
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import { View, Text, TextInput, Pressable, StyleSheet, Modal, Button } from "react-native";
 import { useRealm } from '../useRealm';
+import CustomPressable from "./CustomPressable";
 
+export default function OrderItem({ item , onDelete }) {
 
-export default function OrderItem({ item }) {
+ if (!item || !item.isValid()) {
+    return null;
+  }
+
+  const safeId = item.id; // now safe, only runs if valid
+
   const [confirmedQty, setConfirmedQty] = useState(item.quantitycfm || 0);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [newDescription, setNewDescription] = useState(item.description);
 
   const realm = useRealm();
 
  useEffect(() => {
     setConfirmedQty(item.quantitycfm || 0);
   }, [item.quantitycfm]);
+
+  useEffect(() => {
+  if (!item || !item.isValid()) {
+    setModalVisible(false);
+  }
+}, [item]);
 
   const updateRealmQty = (newQty) => {
     setConfirmedQty(newQty);
@@ -24,13 +39,72 @@ export default function OrderItem({ item }) {
     });
   };
 
+  const updateRealmDescription = () => {
+    if (!realm) return;
+
+    realm.write(() => {
+      const order = realm.objectForPrimaryKey("Orders", item.id);
+      if (order) order.description = newDescription;
+    });
+
+    setModalVisible(false);
+  };
+
+  const deleteItem = () => {
+   
+     setModalVisible(false);
+     // notify parent so it removes this item from its list
+    if (onDelete && safeId) onDelete(safeId);
+  }
+
   const increment = () => updateRealmQty(confirmedQty + 1);
   const decrement = () => updateRealmQty(Math.max(0, confirmedQty - 1));
 
   return (
     <View style={styles.card}>
       {/* Line 1 */}
-      <Text style={styles.description}>{item.description}</Text>
+        <Pressable onPress={() => setModalVisible(true)}>
+       <Text style={styles.description}>{item.description}</Text>
+        </Pressable>
+     
+
+          {/* Modal for editing description */}
+      <Modal visible={modalVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Edit Description</Text>
+            <TextInput
+              style={styles.modalInput}
+              value={newDescription}
+              onChangeText={setNewDescription}
+            />
+          
+
+           <View style={{ flexDirection: "row", padding: 8, gap: 8, justifyContent : 'space-between'}}>
+                 <CustomPressable
+                text="Cancel"
+                borderRadius={18}
+                hoverColor="#0EA371" // only on web
+                onPress={() => setModalVisible(false)}
+                /> 
+                <CustomPressable
+                text="Delete"
+                borderRadius={18}
+                hoverColor="#0EA371" // only on web
+                onPress={deleteItem}
+                />
+                 <CustomPressable
+                text="Save"
+                borderRadius={18}
+                hoverColor="#0EA371" // only on web
+                onPress={updateRealmDescription}
+                />
+                </View>
+
+
+          </View>
+        </View>
+      </Modal>
 
       {/* Line 2 */}
       <Text style={styles.subtext}>
@@ -144,5 +218,22 @@ const styles = StyleSheet.create({
   confirmedCard: {
     backgroundColor: "#e0ffe0", // light green for confirmed
     borderColor: "#00aa00",
-  }
+  },
+  modalOverlay: {
+  flex: 1,
+  justifyContent: "center",  // centers vertically
+  alignItems: "center",      // centers horizontally
+  backgroundColor: "rgba(0,0,0,0.5)", // dimmed background
+},
+modalContent: {
+  width: "80%",
+  backgroundColor: "#fff",
+  borderRadius: 10,
+  padding: 20,
+  elevation: 5,
+  shadowColor: "#000",
+  shadowOpacity: 0.3,
+  shadowOffset: { width: 0, height: 2 },
+  shadowRadius: 6,
+},
 });

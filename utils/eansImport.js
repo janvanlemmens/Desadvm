@@ -31,7 +31,7 @@ const parseEansFile = (text) => {
     }
 
     result.push({
-      ean: parseInt(eanStr, 10),  // convert to int
+      ean: eanStr,// convert to int
       descr1: descr1 || "",
       descr2: descr2 || "",
     });
