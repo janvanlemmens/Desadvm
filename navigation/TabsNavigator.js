@@ -9,6 +9,7 @@ import ScanScreen from "../screens/ScanScreen";
 import  DownloadEans from "../components/DownloadEans";
 import { Text, View, TouchableOpacity } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import NewOrder from "../components/NewOrder";
 
 const Tab = createBottomTabNavigator();
 
@@ -31,6 +32,7 @@ const HeaderUsername = ({ name }) => (
 const HeaderMenu = ({ onLogout }) => {
   const [open, setOpen] = useState(false);
   const [showDownload, setShowDownload] = useState(false);
+  const [newOrder, setNewOrder] = useState(false);
   return (
     <View style={{ position: "relative" }}>
       <TouchableOpacity
@@ -66,7 +68,7 @@ const HeaderMenu = ({ onLogout }) => {
               onLogout();
             }}
           >
-            <Text style={styles.buttonText}>Uitloggen</Text>
+            <Text style={styles.buttonText}>Log Out</Text>
           </TouchableOpacity>
           <TouchableOpacity
           style={styles.button}
@@ -78,6 +80,16 @@ const HeaderMenu = ({ onLogout }) => {
           >
             <Text style={styles.buttonText}>Download Eans</Text>
           </TouchableOpacity>
+           <TouchableOpacity
+          style={styles.button}
+            onPress={() => {
+              setOpen(false);
+              setNewOrder(true)
+      
+            }}
+          >
+            <Text style={styles.buttonText}>New Order</Text>
+          </TouchableOpacity>
          
         </View>
       ) }
@@ -85,7 +97,8 @@ const HeaderMenu = ({ onLogout }) => {
         visible={showDownload}
         onClose={() => setShowDownload(false)}
       />
-
+      <NewOrder visible={newOrder} onClose={() => setNewOrder(false)}
+      />
     </View>
   );
 };

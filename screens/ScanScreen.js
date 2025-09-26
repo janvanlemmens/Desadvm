@@ -99,7 +99,8 @@ export default function ScanScreen({ route, navigation }) {
      }
 
     // Prevent empty or invalid codes
-    if (!scannedCode || scannedCode.length < 3) {
+    const isNumeric = /^\d+$/.test(scannedCode);
+    if (!scannedCode || scannedCode.length < 3 || !isNumeric) {
       console.log("⚠️ Ignored invalid code:", scannedCode);
       setBarcode("");
       inputRef.current?.clear();
