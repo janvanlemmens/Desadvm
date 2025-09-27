@@ -12,10 +12,12 @@ const [suppliers, setsetSuppliers] = useState([]);
 const [supplier, setSupplier] = useState("");
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 const realm = useRealm();
+const [dpa, setDpa] = useState("");
 
  useEffect(() => {
     async function loadSuppliers() {
         const dpa = await SecureStore.getItemAsync("depot");
+        setDpa(dpa);
       try {
        const response = await axios.post(
         apiUrl + "/rest.desadv.cls?func=DeAdSupp",
@@ -54,7 +56,28 @@ const realm = useRealm();
       alert("Order for this supplier already exists.");
       return;
     }
-  }
+    realm.write(() => {
+      const today = new Date();
+      const formatted = today.toISOString().split("T")[0];
+        const newOrder = realm.create("Orders", {
+        id: `${formatted}|${supplier}|9999999999999`, // unique id
+        deliveryNote: "New Order",
+        depot: dpa,
+        arrival: formatted,
+        supplier: supplier,
+        article: "",
+        description: "Unknown item",
+        profile: "N/A",
+        ean: "9999999999999",
+        brand: "N/A",
+        quantity: 0,
+        quantitycfm: 0,
+      });
+      console.log("New order added:", newOrder);
+    })
+  };
+
+
   function handleSelectSupplier(supp) {
     setSupplier(supp);
   }

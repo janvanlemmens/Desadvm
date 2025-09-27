@@ -89,11 +89,15 @@ export default function ScanScreen({ route, navigation }) {
 
     lastScanRef.current = { code: scannedCode, ts: now };
  let eandescr = "Unknown item";
+ let eanbrand = "N/A";
+ let eanprofile = "N/A";
     console.log("✅ scannedCode:", JSON.stringify(scannedCode));
      const results1 = realm1.objects("Eans").filtered("ean == $0", scannedCode);
      if (results1.length > 0) {
       console.log("Found in Eans:", results1[0].descr1);
       eandescr = results1[0].descr1;
+      eanbrand = results1[0].brand;
+      eanprofile = results1[0].profile;
      } else {
       console.log("EAN not found in database");
      }
@@ -117,7 +121,7 @@ export default function ScanScreen({ route, navigation }) {
           item.code === scannedCode ? { ...item, count: item.count + 1 } : item
         );
       } else {
-        return [...prev, { code: scannedCode, count: 1 , descr: eandescr}];
+        return [...prev, { code: scannedCode, count: 1 , descr: eandescr, brand: eanbrand, profile: eanprofile }];
       }
     });
 
@@ -181,7 +185,7 @@ export default function ScanScreen({ route, navigation }) {
       console.log("Initial results:", results.length);
        
       const barcodeArray = results.filtered("quantitycfm > 0").map(item => {
-    console.log("Mapping item:", item.ean, item.quantitycfm);
+      console.log("Mapping item:", item.ean, item.quantitycfm);
 
         try {
           const match = realm1.objects("Eans").filtered("ean == $0", item.ean);

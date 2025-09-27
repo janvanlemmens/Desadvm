@@ -123,7 +123,7 @@ export default function OrderItem({ item , onDelete }) {
           </Pressable>
 
           <TextInput
-            style={[styles.qtyInput, confirmedQty === item.quantity && {
+            style={[styles.qtyInput, confirmedQty === item.quantity && confirmedQty > 0 && {
               backgroundColor: "#8cf68cff",
               color: "#000",
               borderWidth: 2,

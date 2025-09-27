@@ -57,13 +57,17 @@ const saveEansToRealm = async (records, batchSize = 1000) => {
   const chunks = chunkArray(records, batchSize);
 
   for (let i = 0; i < chunks.length; i++) {
+    try {
     realm.write(() => {
       chunks[i].forEach((rec) => {
         realm.create("Eans", rec, "modified");
       });
     });
     console.log(`Inserted batch ${i + 1}/${chunks.length}`);
+  } catch (err) {
+    console.error(`Error inserting batch ${i + 1}:`, err);
   }
+  } //end for
 
   realm.close();
 };
