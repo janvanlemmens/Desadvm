@@ -5,5 +5,7 @@ export const EansSchema = {
     ean: "string", // full order string
     descr1: "string", 
     descr2: "string", 
+    brand: "string", 
+    profile: "string", 
   },
 };

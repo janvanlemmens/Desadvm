@@ -20,7 +20,7 @@ const parseEansFile = (text) => {
   for (const line of lines) {
     if (!line.trim()) continue; // skip empty lines
 
-    const [eanStr, descr1, descr2] = line.split(";");
+    const [eanStr, descr1, descr2, brand, profile] = line.split(";");
     if (!eanStr) continue;
 
     const eanNum = parseInt(eanStr, 10);
@@ -34,6 +34,8 @@ const parseEansFile = (text) => {
       ean: eanStr,// convert to int
       descr1: descr1 || "",
       descr2: descr2 || "",
+      brand: brand || "",
+      profile: profile || "",
     });
   }
 

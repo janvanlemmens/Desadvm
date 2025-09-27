@@ -236,4 +236,9 @@ modalContent: {
   shadowOffset: { width: 0, height: 2 },
   shadowRadius: 6,
 },
+modalTitle: {
+  fontSize: 18,
+  color: "#c96161ff",
+}
+
 });

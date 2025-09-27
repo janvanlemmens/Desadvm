@@ -189,7 +189,9 @@ export default function ScanScreen({ route, navigation }) {
          return {
           code: item.ean,
            count: item.quantitycfm,
-          descr: match[0]?.descr1 ?? "",
+           descr: match[0]?.descr1 ?? "",
+           brand: match[0]?.brand ?? "",
+          profile: match[0]?.profile ?? ""
        };
         } catch (e) {
           console.log("Error querying Eans:", e.message);
@@ -286,7 +288,18 @@ export default function ScanScreen({ route, navigation }) {
             <Text style={{ fontSize: 18 }}>x{item.count}</Text>
           </View>
           <View>
-            <Text style={{ fontSize: 12, color: '#555', paddingLeft: 8 }}>{item.descr}</Text>
+            <Text style={{ fontSize: 16, color: '#c96161ff', paddingLeft: 8 , fontWeight: "600"}}>{item.descr.replace(item.profile, "").trim()}</Text>
+          </View>
+           <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "left",
+              padding: 8,
+            }}
+          >
+            <Text style={{ fontSize: 16 , color: '#c96161ff'}}>{item.profile} - </Text>
+            <Text style={{ fontSize: 16 , color: '#c96161ff'}}>{item.brand}</Text>
+            
           </View>
 </Swipeable>
 

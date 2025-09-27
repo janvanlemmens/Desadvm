@@ -3,12 +3,15 @@ import React, { useEffect, useState } from 'react'
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
 import CustomPressable from "./CustomPressable";
+import AutocompleteInput from './AutocompleteInput';
+import { useRealm } from '../useRealm';
 
 const NewOrder = ({ visible, onClose}) => {
 
 const [suppliers, setsetSuppliers] = useState([]);
 const [supplier, setSupplier] = useState("");
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+const realm = useRealm();
 
  useEffect(() => {
     async function loadSuppliers() {
@@ -27,18 +30,33 @@ const apiUrl = process.env.EXPO_PUBLIC_API_URL;
       );
       console.log("Suppliers:", response.data);
       const data = response.data || [];
-      //data.sort((a, b) => a.supplier.localeCompare(b.supplier));    
-        //setsetSuppliers(data);
+      const sarr = response.data.map(item => item.Supplier);
+      setsetSuppliers(sarr);
+       console.log("Suppliers loaded:", sarr);
       } catch (error) {
         console.error("Error fetching suppliers:", error);
       }
     }
     loadSuppliers();
-  }, [suppliers]);
+  }, []);
 
   function handleClose() {
     onClose();
-    setSupplier("");    
+    setSupplier("");   
+    if (!realm) return;
+    if (!supplier) return;
+
+    const existing = realm
+      .objects("Orders")
+      .filtered("supplier == $0", supplier);
+    if (existing.length > 0) {
+      console.log("Supplier already exists locally, not adding.");
+      alert("Order for this supplier already exists.");
+      return;
+    }
+  }
+  function handleSelectSupplier(supp) {
+    setSupplier(supp);
   }
 
 
@@ -51,17 +69,17 @@ const apiUrl = process.env.EXPO_PUBLIC_API_URL;
       >
         <View style={styles.modalBackground}>
           <View style={styles.modalContent}>
-             <TextInput
-                        placeholder="Supplier"
-                        style={styles.input}
-                        value={supplier}
-                        onChangeText={setSupplier}
-                      />
+             <AutocompleteInput
+            data={suppliers}
+            placeholder="Search supplier..."
+            onSelect={handleSelectSupplier}
+       />
                        <CustomPressable
-                                      text="Save"
-                                      borderRadius={18}
-                                      hoverColor="#0EA371" // only on web
-                                      onPress={handleClose}
+                        text="Add Order"
+                        borderRadius={18}
+                        style ={{marginTop:20, backgroundColor:"#0EA371"}}
+                        hoverColor="#0EA371" // only on web
+                        onPress={handleClose}
                                       /> 
           </View>
         </View>
@@ -91,5 +109,6 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 12,
     alignItems: "center",
+    minWidth: 300,
   },
 })
