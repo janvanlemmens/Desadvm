@@ -65,6 +65,11 @@ export default function OrderItem({ item , onDelete }) {
       {/* Line 1 */}
         <Pressable onPress={() => setModalVisible(true)}>
        <Text style={styles.description}>{item.description}</Text>
+
+          {/* Line 2 */}
+      <Text style={styles.subtext}>
+        {item.profile} - {item.brand}
+      </Text>
         </Pressable>
      
 
@@ -83,19 +88,22 @@ export default function OrderItem({ item , onDelete }) {
            <View style={{ flexDirection: "row", padding: 8, gap: 8, justifyContent : 'space-between'}}>
                  <CustomPressable
                 text="Cancel"
-                borderRadius={18}
+                style = {{paddingVertical: 4, borderRadius: 8, height: 32}}
+                textStyle = {{ fontSize: 16, fontWeight: "500"}}
                 hoverColor="#0EA371" // only on web
                 onPress={() => setModalVisible(false)}
                 /> 
                 <CustomPressable
                 text="Delete"
-                borderRadius={18}
+                style = {{paddingVertical: 4, borderRadius: 8, height: 32}}
+                textStyle = {{ fontSize: 16, fontWeight: "500"}}
                 hoverColor="#0EA371" // only on web
                 onPress={deleteItem}
                 />
                  <CustomPressable
                 text="Save"
-                borderRadius={18}
+                style = {{paddingVertical: 4, borderRadius: 8, height: 32}}
+                textStyle = {{ fontSize: 16, fontWeight: "500"}}
                 hoverColor="#0EA371" // only on web
                 onPress={updateRealmDescription}
                 />
@@ -106,10 +114,7 @@ export default function OrderItem({ item , onDelete }) {
         </View>
       </Modal>
 
-      {/* Line 2 */}
-      <Text style={styles.subtext}>
-        {item.profile} - {item.brand}
-      </Text>
+   
 
       {/* Line 3 */}
       <View style={styles.row}>
@@ -226,7 +231,7 @@ const styles = StyleSheet.create({
   backgroundColor: "rgba(0,0,0,0.5)", // dimmed background
 },
 modalContent: {
-  width: "80%",
+  width: "90%",
   backgroundColor: "#fff",
   borderRadius: 10,
   padding: 20,
@@ -239,6 +244,12 @@ modalContent: {
 modalTitle: {
   fontSize: 18,
   color: "#c96161ff",
+},
+modalInput: {
+  borderWidth: 2,
+  borderColor: "#ccc",
+  borderRadius: 6,
+  padding: 6,
 }
 
 });

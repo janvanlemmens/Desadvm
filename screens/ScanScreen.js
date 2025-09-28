@@ -6,6 +6,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useRealm, useRealm1 } from "../useRealm";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Swipeable } from "react-native-gesture-handler";
+import { useBuzzer } from "../hooks/useBuzzer";
 
 export default function ScanScreen({ route, navigation }) {
   const { arrival, supplier, deliveryNote } = route.params;
@@ -21,6 +22,7 @@ export default function ScanScreen({ route, navigation }) {
   const realm = useRealm();
   const realm1 = useRealm1();
   const insets = useSafeAreaInsets();
+  const { buzz } = useBuzzer();
   
 
   const updateQuantities = (arr, supp, barcodes) => {
@@ -104,8 +106,10 @@ export default function ScanScreen({ route, navigation }) {
 
     // Prevent empty or invalid codes
     const isNumeric = /^\d+$/.test(scannedCode);
-    if (!scannedCode || scannedCode.length < 3 || !isNumeric) {
+    if (!scannedCode || scannedCode.length < 3 || !isNumeric || scannedCode.length > 14) {
       console.log("⚠️ Ignored invalid code:", scannedCode);
+      alert("Invalid barcode scanned: " + scannedCode);
+      buzz();
       setBarcode("");
       inputRef.current?.clear();
       inputRef.current?.focus();

@@ -42,7 +42,7 @@ export default function LoginScreen({ onLogin }) {
   const [checkingToken, setCheckingToken] = useState(true);
 
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
-  console.log("api", apiUrl);
+  //console.log("api", apiUrl);
 
   useEffect(() => {
     const logDevice = async () => {

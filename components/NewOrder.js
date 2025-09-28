@@ -97,13 +97,22 @@ const [dpa, setDpa] = useState("");
             placeholder="Search supplier..."
             onSelect={handleSelectSupplier}
        />
-                       <CustomPressable
-                        text="Add Order"
-                        borderRadius={18}
-                        style ={{marginTop:20, backgroundColor:"#0EA371"}}
-                        hoverColor="#0EA371" // only on web
-                        onPress={handleClose}
-                                      /> 
+       <View flexDirection="row" style={{justifyContent: 'space-between', width: '100%'}}>
+          <CustomPressable
+             text="Cancel"
+             style = {{paddingVertical: 4, borderRadius: 8, height: 32, marginTop: 12}}
+            textStyle = {{ fontSize: 16, fontWeight: "500"}}
+            hoverColor="#0EA371" // only on web
+            onPress={onClose}
+             />
+              <CustomPressable
+             text="Add Order"
+             style = {{paddingVertical: 4, borderRadius: 8, height: 32, marginTop: 12}}
+            textStyle = {{ fontSize: 16, fontWeight: "500"}}
+            hoverColor="#0EA371" // only on web
+            onPress={handleClose}
+             />
+             </View>
           </View>
         </View>
       </Modal>
@@ -119,7 +128,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     padding: 10,
     borderRadius: 5,
-    width: 300,
+    width: 30
   },
    modalBackground: {
     flex: 1,
@@ -132,6 +141,6 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 12,
     alignItems: "center",
-    minWidth: 300,
+    width: "90%",
   },
 })
