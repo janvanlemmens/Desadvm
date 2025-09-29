@@ -56,6 +56,7 @@ export default function LoginScreen({ onLogin }) {
         `Running on: ${brand} ${model} (${systemName} ${systemVersion})`
       );
       //Running on: unitech EA520 (Android 11)
+      // buzzers on pixabay: https://pixabay.com/sound-effects/search/buzzer/
       //npx react-native run-android => new android/app/build/outputs/apk/debug/app-debug.apk
       //cd android ./gradlew assembleRelease (niet is bare workflow)
       //adb install android/app/build/outputs/apk/release/app-release.apk

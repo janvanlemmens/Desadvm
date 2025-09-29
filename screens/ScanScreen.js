@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, TextInput, Text, StyleSheet, FlatList, Pressable } from "react-native";
+import { View, TextInput, Text, StyleSheet, FlatList, Pressable, TouchableOpacity, Keyboard } from "react-native";
 import CustomPressable from "../components/CustomPressable";
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
@@ -7,6 +7,7 @@ import { useRealm, useRealm1 } from "../useRealm";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Swipeable } from "react-native-gesture-handler";
 import { useBuzzer } from "../hooks/useBuzzer";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function ScanScreen({ route, navigation }) {
   const { arrival, supplier, deliveryNote } = route.params;
@@ -23,6 +24,8 @@ export default function ScanScreen({ route, navigation }) {
   const realm1 = useRealm1();
   const insets = useSafeAreaInsets();
   const { buzz } = useBuzzer();
+  const [manualMode, setManualMode] = useState(false);
+  const [showIof, setShowIof] = useState(false);
   
 
   const updateQuantities = (arr, supp, barcodes) => {
@@ -106,7 +109,7 @@ export default function ScanScreen({ route, navigation }) {
 
     // Prevent empty or invalid codes
     const isNumeric = /^\d+$/.test(scannedCode);
-    if (!scannedCode || scannedCode.length < 3 || !isNumeric || scannedCode.length > 14) {
+    if ((!scannedCode || !isNumeric || scannedCode.length > 14 || scannedCode.length < 13) && (!manualMode)) {
       console.log("⚠️ Ignored invalid code:", scannedCode);
       alert("Invalid barcode scanned: " + scannedCode);
       buzz();
@@ -136,7 +139,10 @@ export default function ScanScreen({ route, navigation }) {
   };
 
   const handleScanChange = (text) => {
+   
+    console.log("handleScanChange", text.length);
     setBarcode(text);
+     if (text.length<13 && manualMode) return;
     if (brand != "unitech") return;
     // clear previous timeout
     if (scanTimeoutRef.current) {
@@ -162,6 +168,7 @@ export default function ScanScreen({ route, navigation }) {
 
   // handle Enter/Return key on emulator
   const handleSubmitEditing = () => {
+    console.log("handleSubmitEditing", barcode);
     if (barcode.trim() !== "") {
       handleScanComplete(barcode.trim());
     }
@@ -258,6 +265,21 @@ export default function ScanScreen({ route, navigation }) {
     );
   };
 
+  const toggleKeyboard = () => {
+    if (manualMode) {
+      // hide keyboard
+      Keyboard.dismiss();
+      setManualMode(false);
+      setShowIof(false);
+    } else {
+      // focus TextInput → opens keyboard
+      setManualMode(true);
+      setShowIof(true);
+      inputRef.current?.focus();
+      
+    }
+  };
+
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom + 8 }]}>
       <View style={{ alignItems: "center" }}>
@@ -272,8 +294,16 @@ export default function ScanScreen({ route, navigation }) {
         onChangeText={handleScanChange} // scanner detection
         onSubmitEditing={handleSubmitEditing} // emulator support
         autoFocus
-        showSoftInputOnFocus={false}
+        showSoftInputOnFocus={showIof}
+        keyboardType="numeric"
       />
+      <TouchableOpacity onPress={toggleKeyboard} style={{ marginLeft: 8 , position: 'absolute', top: 10, right: 10  }}>
+          <MaterialIcons
+            name="keyboard"
+            size={28}
+            color={manualMode ? "blue" : "gray"}
+          />
+        </TouchableOpacity>
 
       {/* FlatList showing scanned barcodes */}
       <FlatList
@@ -349,4 +379,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },
+  fab: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    backgroundColor: "#007bff",
+    borderRadius: 50,
+    padding: 16,
+    elevation: 5, // Android shadow
+    shadowColor: "#000", // iOS shadow
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 3
+  }
 });

@@ -6,7 +6,7 @@ import * as SecureStore from "expo-secure-store";
 import LoginScreen from "./screens/LoginScreen";
 import TabsNavigator from "./navigation/TabsNavigator"; // your existing tab navigation
 import { RealmProvider } from "@realm/react";
-import { useRealm, closeRealm } from './useRealm';
+import { useRealm, useRealm1, closeRealm, closeRealm1 } from './useRealm';
 import { OrdersSchema } from "./models/OrdersSchema";
 
 const Stack = createNativeStackNavigator();
@@ -34,6 +34,7 @@ function AppStack({ onLogout }) {
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // <- basic auth state
   const realm = useRealm();
+  const realm1 = useRealm1();
   const handleLogin = () => setIsLoggedIn(true);
   const handleLogout = async () => {
     // e.g. clear secure storage, tokens, etc.
@@ -43,6 +44,7 @@ export default function App() {
     if (realm && !realm.isClosed) {
       closeRealm();
     }
+    //realm.delete(realm.objects("Orders"));
   };
 
   return (

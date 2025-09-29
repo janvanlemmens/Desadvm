@@ -35,6 +35,8 @@ const { type } = route.params;
 const [refreshing, setRefreshing] = useState(false)
 const [supplierQuery, setSupplierQuery] = useState("");
 const [noteQuery, setNoteQuery] = useState("");
+const [loading, setLoading] = useState(true);
+
 
 const navigation = useNavigation();
 const realm = useRealm();
@@ -67,7 +69,7 @@ async function fetchAndSaveOrders() {
           });
 
       const data = res.data;
-        //console.log("data",data)
+        console.log("data",data)
       try {
          if (!realm) return;
          realm.write(() => {
@@ -108,14 +110,30 @@ async function fetchAndSaveOrders() {
 useEffect(() => {
   const init = async() => {
   await fetchAndSaveOrders();
+  setLoading(false);
 }
  init();
+
+ /*const timer = setTimeout(() => {
+      if (!notes || notes.length === 0) {
+        setTimeoutReached(true);
+        setLoading(false);
+      }
+    }, 15000);*/
     
 }, [realm]);
 
-if (!notes || notes.length === 0) {
+if (!notes || notes.length === 0) {    
+  if (loading) {
   return <Text>Loading orders...</Text>;
+  } else {  
+  return <Text>No Orders to load...</Text>;
+  } 
 }
+
+/* if (timeoutReached && (!notes || notes.length === 0)) {
+    return <Text>No orders to load...</Text>;
+  }*/
 
 const today = new Date();
 const zd8 =
