@@ -44,6 +44,9 @@ export default function App() {
     if (realm && !realm.isClosed) {
       closeRealm();
     }
+     if (realm1 && !realm1.isClosed) {
+      closeRealm1();
+    }
     //realm.delete(realm.objects("Orders"));
   };
 

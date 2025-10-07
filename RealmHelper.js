@@ -44,6 +44,7 @@ const RealmHelper1 = {
       schema: [EansSchema],
       path: "eans.realm",
       deleteRealmIfMigrationNeeded: true,
+      schemaVersion: 2,
     });
 
     console.log("✅ Realm1 opened globally");

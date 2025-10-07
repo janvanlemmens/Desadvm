@@ -27,6 +27,17 @@ Content-Type: application/json
   
 }
 
+### SuppOpen
+
+POST https://extranet.qteam.be/VPLD/rest.desadv.cls?func=SuppOpen
+Content-Type: application/json
+
+{
+  "depot": 59,
+  "supplier": "UNIROYAL"
+  
+}
+
 ### DeAdCfm
 
 POST https://extranet.qteam.be/VPLD/rest.desadv.cls?func=DeAdCfm

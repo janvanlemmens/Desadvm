@@ -2,6 +2,7 @@ import RNFS from "react-native-fs";
 import Realm from "realm";
 import { EansSchema } from "../models/EansSchema";
 import { RealmHelper1 } from "../RealmHelper";
+import { useRealm1 } from "../useRealm";
 
 const readLocalFile = async (path) => {
   try {
@@ -53,7 +54,8 @@ function chunkArray(array, size) {
 }
 
 const saveEansToRealm = async (records, batchSize = 1000) => {
-  const realm = await RealmHelper1.openRealm1();
+  //Realm.deleteFile({ path: "eans.realm" });
+  const realm = useRealm1() //await RealmHelper1.openRealm1();
   const chunks = chunkArray(records, batchSize);
 
   for (let i = 0; i < chunks.length; i++) {
@@ -69,7 +71,7 @@ const saveEansToRealm = async (records, batchSize = 1000) => {
   }
   } //end for
 
-  realm.close();
+  //realm.close();
 };
 
 

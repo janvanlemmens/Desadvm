@@ -39,7 +39,7 @@ export default function ScanScreen({ route, navigation }) {
           item.quantitycfm = 0;
         });
 
-      barcodes.forEach(({ code, count }) => {
+      barcodes.forEach(({ code, count, descr, brand, profile }) => {
         //console.log("code", code);
         const matchingItems = realm
           .objects("Orders")
@@ -62,9 +62,9 @@ export default function ScanScreen({ route, navigation }) {
           depot: depot,
           deliveryNote,
           article: code,
-          description: "Unknown item",
-          profile: "N/A",
-          brand: "N/A"
+          description: descr,
+          profile: profile,
+          brand: brand
         });
 
           

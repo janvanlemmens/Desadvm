@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Modal, TextInput} from 'react-native'
+import { StyleSheet, Text, View, Modal, FlatList, TouchableOpacity} from 'react-native'
 import React, { useEffect, useState } from 'react'
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
@@ -13,6 +13,10 @@ const [supplier, setSupplier] = useState("");
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 const realm = useRealm();
 const [dpa, setDpa] = useState("");
+const [allnotes, setAllNotes] = useState([]);
+const [notes, setNotes] = useState([]);
+const [selected, setSelected] = useState([]); // keep track of clicked ref1AA values
+
 
  useEffect(() => {
     async function loadSuppliers() {
@@ -41,10 +45,18 @@ const [dpa, setDpa] = useState("");
     }
     loadSuppliers();
   }, []);
+  
+  function handleCancel() {
+    onClose();
+    setSupplier("");   
+    setNotes([]);
+    setAllNotes([]);
+    setSelected([]);
+  }
 
   function handleClose() {
     onClose();
-    setSupplier("");   
+    
     if (!realm) return;
     if (!supplier) return;
 
@@ -56,6 +68,7 @@ const [dpa, setDpa] = useState("");
       alert("Order for this supplier already exists.");
       return;
     }
+      if (selected.length === 0) {
     realm.write(() => {
       const today = new Date();
       const formatted = today.toISOString().split("T")[0];
@@ -75,12 +88,87 @@ const [dpa, setDpa] = useState("");
       });
       console.log("New order added:", newOrder);
     })
+    } else {
+    realm.write(() => {
+      const today = new Date();
+      const formatted = today.toISOString().split("T")[0];
+      selected.forEach((ref1AA) => {
+        // find all entries in allnotes with this ref1AA
+        const entries = allnotes.filter(item => item.ref1AA === ref1AA);
+        entries.forEach(item => {
+          const uniqueId = `${formatted}|${supplier}|${item.ean}`;
+          // Check if order with this id already exists
+          const existingOrder = realm.objectForPrimaryKey("Orders", uniqueId);
+          if (!existingOrder) {
+            const newOrder = realm.create("Orders", {
+              id: uniqueId,
+              deliveryNote: item.ref1AA,
+              depot: item.depot,
+              arrival: item.arrival,
+              supplier: item.supplier,
+              article: item.article,
+              description : item.description || "Unknown item",
+              profile: item.profile || "N/A",
+              ean: item.ean,
+              brand: item.brand || "N/A",
+              quantity: parseInt(item.quantity,10),
+              quantitycfm: 0,
+            });
+            console.log("New order added:", newOrder);
+          } else {
+            // update existing order
+           // increase quantity
+            existingOrder.quantity += parseInt(item.quantity, 10);
+           // expand delivery note
+           existingOrder.deliveryNote = `${existingOrder.deliveryNote}-${item.ref1AA}`;
+    console.log(`Order with id ${uniqueId} already exists. Updated quantity = ${existingOrder.quantity}, deliveryNote = ${existingOrder.deliveryNote}`);
+
+          }
+        });
+      });
+    });
+  }
+    setSupplier("");   
+    setNotes([]);
+    setAllNotes([]);
+    setSelected([]);
   };
 
 
-  function handleSelectSupplier(supp) {
+  async function handleSelectSupplier(supp) {
     setSupplier(supp);
+    const result = await axios.post(
+        apiUrl + "/rest.desadv.cls?func=SuppOpen",
+        {
+          depot : dpa,
+          supplier: supp
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+       // extract ref1AA values
+    setAllNotes(result.data);
+    const allRefs = result.data.map(item => item.ref1AA);
+   const uniqueRefs = [...new Set(allRefs)];
+    setNotes(uniqueRefs.map(ref => ({ ref1AA: ref })));
+    console.log("All notes:", allnotes);
+   
   }
+
+  const toggleSelect = (ref1AA) => {
+    setSelected((prev) => {
+      if (prev.includes(ref1AA)) {
+        // already selected → remove
+        return prev.filter((id) => id !== ref1AA);
+      } else {
+        // not selected → add
+        return [...prev, ref1AA];
+      }
+    });
+  };
 
 
   return (
@@ -96,14 +184,32 @@ const [dpa, setDpa] = useState("");
             data={suppliers}
             placeholder="Search supplier..."
             onSelect={handleSelectSupplier}
-       />
+         />
+         <View style={{height: 300, width: '100%', marginTop: 12}}>
+         <FlatList
+        data={notes}
+        keyExtractor={(item) => item.ref1AA}
+        renderItem={({ item }) => {
+          const isSelected = selected.includes(item.ref1AA);
+          return (
+            <TouchableOpacity onPress={() => toggleSelect(item.ref1AA)}>
+              <View style={[styles.item, isSelected && styles.itemSelected]}>
+                <Text style={[styles.text, isSelected && styles.textSelected]}>
+                  {item.ref1AA}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          );
+        }}
+      />
+      </View>
        <View flexDirection="row" style={{justifyContent: 'space-between', width: '100%'}}>
           <CustomPressable
              text="Cancel"
              style = {{paddingVertical: 4, borderRadius: 8, height: 32, marginTop: 12}}
             textStyle = {{ fontSize: 16, fontWeight: "500"}}
             hoverColor="#0EA371" // only on web
-            onPress={onClose}
+            onPress={handleCancel}
              />
               <CustomPressable
              text="Add Order"
@@ -142,5 +248,22 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     width: "90%",
+  },
+  item: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    backgroundColor: "#fff",
+  },
+  itemSelected: {
+    backgroundColor: "#cce5ff", // highlight when selected
+  },
+  text: {
+    fontSize: 14,
+    color: "#333",
+  },
+  textSelected: {
+    fontWeight: "bold",
+    color: "#004085",
   },
 })
