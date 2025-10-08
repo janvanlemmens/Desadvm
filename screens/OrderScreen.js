@@ -10,6 +10,7 @@ const OrderScreen = ({route, navigation}) => {
 const {arrival, supplier, deliveryNote} = route.params ?? {};
 const [order, setOrder] = useState([]);
 
+
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 const realm = useRealm();
 
@@ -29,6 +30,7 @@ useEffect(() => {
 
          setOrder(results); // keep Realm objects live
         console.log("📊 Query results:", results.length);
+        
       } catch (e) {
         console.error("Error opening realm", e);
       }

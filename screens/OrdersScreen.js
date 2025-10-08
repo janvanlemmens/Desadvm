@@ -214,7 +214,7 @@ const distinctNotesSorted = getDistinctNotes(notes1).sort(
   />
   <TextInput
     style={[styles.searchInput, { flex: 1 }]}
-    placeholder="Search by Delivery Note..."
+    placeholder="Search by Profile..."
     value={noteQuery}
     onChangeText={setNoteQuery}
   />
@@ -234,7 +234,7 @@ const distinctNotesSorted = getDistinctNotes(notes1).sort(
        <View style={[styles.card, item.confirmed && styles.confirmedCard]}>
           <Text style={styles.supplier}>🏭 Supplier: {item.supplier}</Text>
           <Text>📅 Arrival: {item.arrival}</Text>
-          <Text>📦 Delivery Note: {item.deliveryNote}</Text>
+         <Text>🛞 Profile: {item.deliveryNote}</Text>
         </View>
         </Pressable>
       )

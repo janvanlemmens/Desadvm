@@ -92,6 +92,19 @@ const [selected, setSelected] = useState([]); // keep track of clicked ref1AA va
     realm.write(() => {
       const today = new Date();
       const formatted = today.toISOString().split("T")[0];
+
+      const profiles = allnotes
+      // keep only items whose ref1AA is in selected
+      .filter(note => selected.includes(note.ref1AA))
+      // map to their profile
+     .map(note => note.profile);
+
+    // remove duplicates with Set
+    const uniqueProfiles = [...new Set(profiles)];
+
+    // join into one string
+    const profileString = uniqueProfiles.join("~");
+
       selected.forEach((ref1AA) => {
         // find all entries in allnotes with this ref1AA
         const entries = allnotes.filter(item => item.ref1AA === ref1AA);
@@ -102,7 +115,7 @@ const [selected, setSelected] = useState([]); // keep track of clicked ref1AA va
           if (!existingOrder) {
             const newOrder = realm.create("Orders", {
               id: uniqueId,
-              deliveryNote: item.ref1AA,
+              deliveryNote: profileString,
               depot: item.depot,
               arrival: item.arrival,
               supplier: item.supplier,
@@ -126,6 +139,10 @@ const [selected, setSelected] = useState([]); // keep track of clicked ref1AA va
           }
         });
       });
+      const totalOrders = realm
+        .objects("Orders")
+        .filtered("supplier == $0", supplier).length;
+      console.log(`Total orders for supplier ${supplier}: ${totalOrders}`);
     });
   }
     setSupplier("");   
@@ -137,6 +154,7 @@ const [selected, setSelected] = useState([]); // keep track of clicked ref1AA va
 
   async function handleSelectSupplier(supp) {
     setSupplier(supp);
+    
     const result = await axios.post(
         apiUrl + "/rest.desadv.cls?func=SuppOpen",
         {
@@ -149,12 +167,12 @@ const [selected, setSelected] = useState([]); // keep track of clicked ref1AA va
           },
         }
       )
-       // extract ref1AA values
+       console.log("Result:", result.data);
     setAllNotes(result.data);
     const allRefs = result.data.map(item => item.ref1AA);
-   const uniqueRefs = [...new Set(allRefs)];
+    const uniqueRefs = [...new Set(allRefs)];
     setNotes(uniqueRefs.map(ref => ({ ref1AA: ref })));
-    console.log("All notes:", allnotes);
+    
    
   }
 
@@ -167,7 +185,9 @@ const [selected, setSelected] = useState([]); // keep track of clicked ref1AA va
         // not selected → add
         return [...prev, ref1AA];
       }
+     
     });
+     console.log("Selected:", selected);
   };
 
 
