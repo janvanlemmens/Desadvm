@@ -97,7 +97,7 @@ async function fetchAndSaveOrders() {
                 
               }, Realm.UpdateMode.Modified)
 
-              console.log("Created:",savedOrder.id,"->", savedOrder.arrival+"-"+savedOrder.supplier)
+              console.log("Created:",savedOrder.id,"->", savedOrder.arrival+"-"+savedOrder.supplier+"-"+savedOrder.deliveryNote)
              
       });
       });

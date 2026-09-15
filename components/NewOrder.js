@@ -115,7 +115,7 @@ const [selected, setSelected] = useState([]); // keep track of clicked ref1AA va
           if (!existingOrder) {
             const newOrder = realm.create("Orders", {
               id: uniqueId,
-              deliveryNote: profileString,
+              deliveryNote: profileString + "_" + item.ref1AA,
               depot: item.depot,
               arrival: item.arrival,
               supplier: item.supplier,

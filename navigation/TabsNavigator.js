@@ -69,6 +69,7 @@ const HeaderMenu = ({ onLogout }) => {
             }}
           >
             <Text style={styles.buttonText}>Log Out</Text>
+            
           </TouchableOpacity>
           <TouchableOpacity
           style={styles.button}

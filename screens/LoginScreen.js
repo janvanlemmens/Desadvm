@@ -61,7 +61,7 @@ export default function LoginScreen({ onLogin }) {
       //cd android ./gradlew assembleRelease (niet is bare workflow)
       //adb install android/app/build/outputs/apk/release/app-release.apk
       //eas build -p android --profile preview --local
-      //adb push /Users/janvanlemmens/RNDev/builds/build-20251007.apk /sdcard/Download
+      //adb push /Users/janvanlemmens/RNDev/builds/build-20251008.apk /sdcard/Download
       //adb logcat | grep ReactNativeJS
     };
 

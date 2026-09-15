@@ -32,5 +32,8 @@
     "react-native-screens": "~4.16.0",
     "realm": "^20.2.0"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "baseline-browser-mapping": "^2.8.30"
+  }
 }
