@@ -215,7 +215,7 @@ const [selected, setSelected] = useState([]); // keep track of clicked ref1AA va
             <TouchableOpacity onPress={() => toggleSelect(item.ref1AA)}>
               <View style={[styles.item, isSelected && styles.itemSelected]}>
                 <Text style={[styles.text, isSelected && styles.textSelected]}>
-                  {item.ref1AA}
+                  {item.ref1AA.split('_')[0]}  {/* Display only the part before the underscore */}
                 </Text>
               </View>
             </TouchableOpacity>
